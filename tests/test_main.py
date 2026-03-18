@@ -66,3 +66,18 @@ def test_create_todo_empty_title(client):
     response = client.post("/todos", data={"title": ""})
     assert response.status_code == 200
     assert "0 items" in response.text
+
+
+def test_toggle_todo(client):
+    client.post("/todos", data={"title": "Toggle me"})
+    response = client.put("/todos/1/toggle")
+    assert response.status_code == 200
+    assert "completed" in response.text
+
+
+def test_delete_todo(client):
+    client.post("/todos", data={"title": "Delete me"})
+    response = client.delete("/todos/1")
+    assert response.status_code == 200
+    assert "Delete me" not in response.text
+    assert "0 items" in response.text

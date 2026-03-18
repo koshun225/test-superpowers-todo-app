@@ -55,3 +55,21 @@ def create_todo(request: Request, title: str = Form(""), db=Depends(get_db)):
         db.commit()
     todos = db.query(Todo).order_by(Todo.created_at.desc()).all()
     return templates.TemplateResponse(request, "partials/todo_list.html", {"todos": todos})
+
+
+@app.put("/todos/{todo_id}/toggle", response_class=HTMLResponse)
+def toggle_todo(request: Request, todo_id: int, db=Depends(get_db)):
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    todo.completed = not todo.completed
+    db.commit()
+    db.refresh(todo)
+    return templates.TemplateResponse(request, "partials/todo_item.html", {"todo": todo})
+
+
+@app.delete("/todos/{todo_id}", response_class=HTMLResponse)
+def delete_todo(request: Request, todo_id: int, db=Depends(get_db)):
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    db.delete(todo)
+    db.commit()
+    todos = db.query(Todo).order_by(Todo.created_at.desc()).all()
+    return templates.TemplateResponse(request, "partials/todo_list.html", {"todos": todos})
