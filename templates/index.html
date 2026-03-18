@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Tasks</h1>
+
+<form hx-post="/todos" hx-target="#todo-list" hx-swap="innerHTML" hx-on::after-request="this.reset()">
+    <input type="text" name="title" placeholder="Add a new task..." class="todo-input" autocomplete="off">
+</form>
+
+<div class="filters">
+    <button class="filter-btn active" hx-get="/todos?filter=all" hx-target="#todo-list" hx-swap="innerHTML">All</button>
+    <button class="filter-btn" hx-get="/todos?filter=active" hx-target="#todo-list" hx-swap="innerHTML">Active</button>
+    <button class="filter-btn" hx-get="/todos?filter=completed" hx-target="#todo-list" hx-swap="innerHTML">Completed</button>
+</div>
+
+<div id="todo-list">
+    {% include "partials/todo_list.html" %}
+</div>
+{% endblock %}

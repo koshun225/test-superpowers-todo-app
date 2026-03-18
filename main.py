@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -26,6 +29,9 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
 
 def get_db():
     db = SessionLocal()
@@ -33,3 +39,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@app.get("/", response_class=HTMLResponse)
+def index(request: Request, db=Depends(get_db)):
+    todos = db.query(Todo).order_by(Todo.created_at.desc()).all()
+    return templates.TemplateResponse(request, "index.html", {"todos": todos})

@@ -1,0 +1,4 @@
+{% for todo in todos %}
+    {% include "partials/todo_item.html" %}
+{% endfor %}
+<div class="todo-count">{{ todos | length }} items</div>

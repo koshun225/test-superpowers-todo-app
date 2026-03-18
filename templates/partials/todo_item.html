@@ -1,0 +1,20 @@
+<div class="todo-item {{ 'completed' if todo.completed }}" id="todo-{{ todo.id }}">
+    <input type="checkbox" {{ "checked" if todo.completed }}
+           hx-put="/todos/{{ todo.id }}/toggle"
+           hx-target="#todo-{{ todo.id }}"
+           hx-swap="outerHTML">
+    <span class="todo-title" ondblclick="this.closest('.todo-item').querySelector('.edit-form').style.display='flex'; this.style.display='none';">
+        {{ todo.title }}
+    </span>
+    <form class="edit-form" style="display:none"
+          hx-put="/todos/{{ todo.id }}"
+          hx-target="#todo-{{ todo.id }}"
+          hx-swap="outerHTML">
+        <input type="text" name="title" value="{{ todo.title }}" class="edit-input"
+               onkeydown="if(event.key==='Escape'){this.closest('.edit-form').style.display='none'; this.closest('.todo-item').querySelector('.todo-title').style.display='';}">
+    </form>
+    <button class="delete-btn"
+            hx-delete="/todos/{{ todo.id }}"
+            hx-target="#todo-list"
+            hx-swap="innerHTML">×</button>
+</div>
