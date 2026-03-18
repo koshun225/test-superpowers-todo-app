@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -45,3 +45,13 @@ def get_db():
 def index(request: Request, db=Depends(get_db)):
     todos = db.query(Todo).order_by(Todo.created_at.desc()).all()
     return templates.TemplateResponse(request, "index.html", {"todos": todos})
+
+
+@app.post("/todos", response_class=HTMLResponse)
+def create_todo(request: Request, title: str = Form(""), db=Depends(get_db)):
+    if title.strip():
+        todo = Todo(title=title.strip())
+        db.add(todo)
+        db.commit()
+    todos = db.query(Todo).order_by(Todo.created_at.desc()).all()
+    return templates.TemplateResponse(request, "partials/todo_list.html", {"todos": todos})

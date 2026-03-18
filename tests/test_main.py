@@ -54,3 +54,15 @@ def test_get_index(client):
     response = client.get("/")
     assert response.status_code == 200
     assert "todo-list" in response.text
+
+
+def test_create_todo_via_api(client):
+    response = client.post("/todos", data={"title": "New task"})
+    assert response.status_code == 200
+    assert "New task" in response.text
+
+
+def test_create_todo_empty_title(client):
+    response = client.post("/todos", data={"title": ""})
+    assert response.status_code == 200
+    assert "0 items" in response.text
