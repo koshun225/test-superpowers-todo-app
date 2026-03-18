@@ -49,7 +49,7 @@ HTMXに合わせ、JSONではなくHTMLパーシャルを返す。
 | Method | Path | Action | Response |
 |--------|------|--------|----------|
 | GET | `/` | タスク一覧ページ表示 | `index.html`（全体ページ） |
-| POST | `/todos` | タスク追加 | `todo_list.html`（リスト全体partial） |
+| POST | `/todos` | タスク追加（空タイトルは無視） | `todo_list.html`（リスト全体partial） |
 | PUT | `/todos/{id}/toggle` | 完了トグル | `todo_item.html`（1件partial） |
 | PUT | `/todos/{id}` | タイトル編集 | `todo_item.html`（1件partial） |
 | DELETE | `/todos/{id}` | タスク削除 | `todo_list.html`（リスト全体partial） |
@@ -87,6 +87,7 @@ HTMXに合わせ、JSONではなくHTMLパーシャルを返す。
   タイトルをダブルクリック → input表示
   → Enter で PUT /todos/{id} (hx-put)
   → 編集後の todo_item.html で差し替え
+  → Escape でキャンセル（元の表示に戻る）
 
 [削除]
   削除ボタンクリック
@@ -125,6 +126,7 @@ fastapi
 uvicorn
 sqlalchemy
 jinja2
+python-multipart
 ```
 
 ### Dev Dependencies
