@@ -81,3 +81,31 @@ def test_delete_todo(client):
     assert response.status_code == 200
     assert "Delete me" not in response.text
     assert "0 items" in response.text
+
+
+def test_edit_todo(client):
+    client.post("/todos", data={"title": "Old title"})
+    response = client.put("/todos/1", data={"title": "New title"})
+    assert response.status_code == 200
+    assert "New title" in response.text
+    assert "Old title" not in response.text
+
+
+def test_filter_active(client):
+    client.post("/todos", data={"title": "Active task"})
+    client.post("/todos", data={"title": "Done task"})
+    client.put("/todos/2/toggle")  # mark "Done task" as completed
+    response = client.get("/todos?filter=active")
+    assert response.status_code == 200
+    assert "Active task" in response.text
+    assert "Done task" not in response.text
+
+
+def test_filter_completed(client):
+    client.post("/todos", data={"title": "Active task"})
+    client.post("/todos", data={"title": "Done task"})
+    client.put("/todos/2/toggle")
+    response = client.get("/todos?filter=completed")
+    assert response.status_code == 200
+    assert "Done task" in response.text
+    assert "Active task" not in response.text

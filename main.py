@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 
+from typing import Optional
+
 from fastapi import Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -72,4 +74,25 @@ def delete_todo(request: Request, todo_id: int, db=Depends(get_db)):
     db.delete(todo)
     db.commit()
     todos = db.query(Todo).order_by(Todo.created_at.desc()).all()
+    return templates.TemplateResponse(request, "partials/todo_list.html", {"todos": todos})
+
+
+@app.put("/todos/{todo_id}", response_class=HTMLResponse)
+def edit_todo(request: Request, todo_id: int, title: str = Form(""), db=Depends(get_db)):
+    todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    if title.strip():
+        todo.title = title.strip()
+        db.commit()
+        db.refresh(todo)
+    return templates.TemplateResponse(request, "partials/todo_item.html", {"todo": todo})
+
+
+@app.get("/todos", response_class=HTMLResponse)
+def list_todos(request: Request, filter: Optional[str] = "all", db=Depends(get_db)):
+    query = db.query(Todo).order_by(Todo.created_at.desc())
+    if filter == "active":
+        query = query.filter(Todo.completed == False)
+    elif filter == "completed":
+        query = query.filter(Todo.completed == True)
+    todos = query.all()
     return templates.TemplateResponse(request, "partials/todo_list.html", {"todos": todos})
